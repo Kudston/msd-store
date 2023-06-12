@@ -1,0 +1,39 @@
+{% extends 'index.html' %}
+{% block content %}
+<table>
+  <thead>
+    <tr>
+      <td>
+        Name
+      </td>
+      <td>
+        Quantity
+      </td>
+      <td>
+        price
+      </td>
+      <td>
+        date
+      </td>
+    </tr>
+  </thead>
+  <tbody>
+  {% for sell in sells %}
+    <tr>
+      <td>
+        {{ sell.product_name }}
+      </td>
+      <td>
+        {{ sell.quantity  }}
+      </td>
+      <td>
+        {{ sell.cost }}
+      </td>
+      <td>
+        {{ sell.date_sold }}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

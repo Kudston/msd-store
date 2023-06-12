@@ -1,0 +1,50 @@
+{% extends 'index.html' %}
+{% include 'messages.html' %}
+{% block content %}
+ <div class="container-fluid" >
+  <table class="table table-bordered">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col">Price</th>
+      <th scope="col">Quantity</th>
+      <th scope="col">Sell</th>
+      
+      <th scope="col">
+      {% if user.is_staff %}
+      Add
+      {% endif %}
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for product in object_list %}
+    <tr>
+      <th scope="row">1</th>
+      <td>{{ product.name }}</td>
+      <td>{{ product.cost }}</td>
+      <td>{{ product.quantity }}</td>
+      <td>
+      <form action="{% url 'edit-product' %}" method="post">
+        {% csrf_token %}
+          <input type="hidden" name="id" value={{ product.id }}>
+          <input type="number" name="number" value="0"><input type="submit" name="action" value="sell">
+        </form>
+      <td>
+      <td>
+      {% if user.is_staff %}
+        <form action="{% url 'edit-product' %}" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="id" value="{{ product.id }}">
+          <input type="number" name="number" value="0">
+          <input type="submit" name="action" value="add">
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+ </div>
+{% endblock %}
