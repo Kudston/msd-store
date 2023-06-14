@@ -4,12 +4,13 @@ from django.shortcuts import render, HttpResponse, reverse, HttpResponseRedirect
 from django.utils import timezone
 from django.views.generic.list import ListView
 from django.views.generic.edit import UpdateView, DeleteView
-from .models import Products,Sells, Adds
+from django.db.models.functions import Lower
 from django.views import View
 from .forms import ProductCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.db.models.functions import Lower
+
+from .models import Products,Sells, Adds
 # Create your views here.
 class ProductsListView(ListView):
     model = Products

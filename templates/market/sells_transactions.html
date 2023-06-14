@@ -4,8 +4,8 @@
 <div class="container-fluid">
   <div class="row container-fluid">
      <input class="col-4 bg-light text-dark" type="text" id="filterInput" placeholder="Type to filter">
-     <input class="col-4 bg-light text-dark" type="date" id="afterDate" placeholder="after_date">
-     <input class="col-4 bg-light text-dark" type="date" id="beforeDate" placeholder="before_date">
+     <input class="col-4 bg-light text-dark" type="date" id="afterDate" placeholder="dd-mm-yyyy">
+     <input class="col-4 bg-light text-dark" type="date" id="beforeDate" placeholder="dd-mm-yyyy">
      
    </div>
 <table class="table">
@@ -20,7 +20,7 @@
   </thead>
   <tbody id="list">
     {% for sell in sells %}
-    <tr>
+    <tr style="display:">
       <th scope="row">1</th>
       <td>{{ sell.product_name }} </td>
       <td>{{ sell.quantity }}</td>
@@ -39,7 +39,10 @@
     const items = list.getElementsByTagName('tr');
     //date fields
     const beforeDateObject = document.getElementById("beforeDate"); 
-      const afterDateObject= document.getElementById("afterDate"); 
+    const afterDateObject= document.getElementById("afterDate"); 
+    const beforeDateValue = beforeDateObject.value
+    const afterDateValue = afterDateObject.value
+      
     //add event listener on loading package  
     document.addEventListener('DOMContentLoaded', function() {
       NumberTable();
@@ -47,8 +50,8 @@
     // Add event listener for input changes
     filterInput.addEventListener('input', filterList)
  
-    beforeDateObject.addEventListener('input', filterDate)
-    afterDateObject.addEventListener('input', filterDate)
+    beforeDateObject.addEventListener('input', filterList)
+    afterDateObject.addEventListener('input', filterList)
   
     function filterList() {
       const filterValue = filterInput.value.toLowerCase(); // Convert the input to lowercase for case-insensitive filtering
@@ -65,9 +68,14 @@
               {
                 const tag = tags[j];
                 const text = tag.textContent.toLowerCase(); // Get the text content of each item and convert it to lowercase
+                const date_tag_value = tags[3].textContent;
                 // If the item matches the filter value, display it, otherwise hide it
-                if (text.indexOf(filterValue) > -1) {
-                  item.style.display = '';
+                if (text.indexOf(filterValue) > -1 && 
+                  ((afterDateValue==="" || new Date(afterDateValue) < new Date(date_tag_value)) && 
+                  (beforeDateValue==="" || new Date(beforeDateValue) > new Date(date_tag_value)))
+                  ) 
+                {
+                  alert(new Date(afterDateValue));
                   found = true;
                   break;
                 } 
@@ -100,55 +108,6 @@
         }
           };
           
-    function filterDate() {
-      const beforeDateValue = beforeDateObject.value
-      const afterDateValue = afterDateObject.value
-       const beforeDateValuejs = new Date(beforeDateValue);
-       const afterDateValuejs = new Date(afterDateValue);
-      // Loop through all the list items/
-      if(items.length>0)
-        {
-          for (let i = 0; i < items.length; i++) {
-            const item = items[i];
-            
-            
-            const tags = item.getElementsByTagName('td')
-            let found = false;
-            for(let j=0; j<tags.length; j++)
-              {
-                const tag = tags[j];
-                const tag_id = tag.id;
-                if(tag_id==="datetime")
-                  {
-                    const tag_date = tag.textContent;
-                    const tag_dateJS = new Date(tag_date);
-                    let before = true;
-                    let after = true;
-                    if(isNaN(beforeDateValuejs)==false)
-                      {
-                        before = tag_dateJS < beforeDateValuejs;
-                      }
-                    if(isNaN(afterDateValuejs)==false)
-                      {
-                        after = tag_dateJS > afterDateValuejs;
-                      }
-                    if(before && after)
-                      {
-                        item.style.display = '';
-                      }else
-                      {
-                        item.style.display = 'none';
-                      }
-                  }
-              }
-          }
-        }
-    };
     
-    function FilterObject() {
-      filterList();
-      filterDate();
-      NumberTable();
-          };
   </script>
 {% endblock %}
