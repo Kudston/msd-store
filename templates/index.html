@@ -18,7 +18,7 @@
  {% endfor %}
 {% endif %}
     <div class="container"> 
-        <nav class="nav justify-content-center">
+        <nav class="nav justify-content-center text-light bg-dark">
           <a class="nav-link active" href="{% url 'products-list' %}">Products Panel</a>
           <a class="nav-link" href="{% url 'sells-transactions' %}">Sells transactions</a>
             <a class="nav-link" href="{% url 'product-create' %}">Add product</a>
@@ -27,7 +27,9 @@
               {% endif %}
                <a class="nav-link " href="{% url 'logout' %}">logout</a>
         </nav>
-         {% block content %}{% endblock %} 
+ {% block content %}{% endblock %} 
      </div>
-<script src="{% static 'bootstrap-4.0.0-dist/js/bootstrap.min.js' %}" crossorigin="anonymous"></script>
+
+  {% block script %}
+  {% endblock %}
   {% endblock %}

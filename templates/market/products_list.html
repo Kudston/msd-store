@@ -1,50 +1,118 @@
-{% extends 'index.html' %}
+{% extends 'index.html' %} 
 {% include 'messages.html' %}
 {% block content %}
  <div class="container-fluid" >
-  <table class="table table-bordered">
-  <thead class="thead-dark">
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">Name</th>
-      <th scope="col">Price</th>
-      <th scope="col">Quantity</th>
-      <th scope="col">Sell</th>
-      
-      <th scope="col">
-      {% if user.is_staff %}
-      Add
-      {% endif %}
-      </th>
-    </tr>
-  </thead>
-  <tbody>
-  {% for product in object_list %}
-    <tr>
-      <th scope="row">1</th>
-      <td>{{ product.name }}</td>
-      <td>{{ product.cost }}</td>
-      <td>{{ product.quantity }}</td>
-      <td>
-      <form action="{% url 'edit-product' %}" method="post">
-        {% csrf_token %}
-          <input type="hidden" name="id" value={{ product.id }}>
-          <input type="number" name="number" value="0"><input type="submit" name="action" value="sell">
-        </form>
-      <td>
-      <td>
-      {% if user.is_staff %}
+   <div class="row container-fluid">
+     <input class="col-8" type="text" id="filterInput" placeholder="Type to filter">
+   </div>
+   <div class="container-fluid">
+    <table class="table table-bordered">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Price</th>
+        <th scope="col">Quantity</th>
+        <th scope="col">Sell</th>
+        {% if user.is_staff %}
+        <th scope="col">
+          Manager Actions
+        </th>
+        {% endif %}
+      </tr>
+    </thead>
+    <tbody id="list">
+    {% for product in object_list %}
+      <tr id="row">
+        <th scope="row">1</th>
+        <td id='product_name'>{{ product.name }}</td>
+        <td>{{ product.unit_price }}</td>
+        <td>{{ product.quantity }}</td>
+        <td>
         <form action="{% url 'edit-product' %}" method="post">
           {% csrf_token %}
-          <input type="hidden" name="id" value="{{ product.id }}">
-          <input type="number" name="number" value="0">
-          <input type="submit" name="action" value="add">
-        </form>
+            <input type="hidden" name="id" value={{ product.id }}>
+            <input type="number" name="number" value="0"><input type="submit" name="action" value="sell">
+            {% if user.is_staff %}
+              <input type="submit" name="action" value="add">
+            {% endif %}
+          </form>
+        </td>
+        {% if user.is_staff %}
+        <td>
+          <p class="row">
+            <a class="btn btn-success col-6 btn-sm" href="{% url 'product-update' product.id %}">Update</a>
+            <a class="btn btn-danger btn-sm col-6" href="{% url 'product-delete' product.id %}">Delete</a>
+            </a>
+        </td>
         {% endif %}
-      </td>
-    </tr>
-  {% endfor %}
-  </tbody>
-</table>
- </div>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+</div>
+
+  <script>
+    // Get the input field and list
+    const filterInput = document.getElementById('filterInput');
+    const list = document.getElementById('list');
+    const items = list.getElementsByTagName('tr');
+
+    document.addEventListener('DOMContentLoaded', function() {
+  // Perform your action here
+      NumberTable();
+    });
+    // Add event listener for input changes
+    filterInput.addEventListener('input', filterList);
+
+    function filterList() {
+      const filterValue = filterInput.value.toLowerCase(); // Convert the input to lowercase for case-insensitive filtering
+       
+      // Loop through all the list items/
+      if(items.length>0)
+        {
+          for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            const tags = item.getElementsByTagName('td')
+            let found = false;
+            for(let j=0; j<3; j++)
+              {
+                const tag = tags[j];
+                const text = tag.textContent.toLowerCase(); // Get the text content of each item and convert it to lowercase
+                // If the item matches the filter value, display it, otherwise hide it
+                if (text.indexOf(filterValue) > -1) {
+                  item.style.display = '';
+                  found = true;
+                  break;
+                } 
+              }
+            if (found==true) {
+                item.style.display = '';
+              } else {
+                item.style.display = 'none';
+              }
+          }
+        }
+      NumberTable();
+          } 
+          
+  function NumberTable() {
+      // Loop through all the list items/
+      if(items.length>0)
+        {
+          let counts = 0;
+          for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            const tags = item.getElementsByTagName('th')
+            const tag = tags[0];
+            if(item.style.display=="")
+            { 
+              counts++;
+              tag.textContent = counts;
+            }
+            }
+        }
+          }
+  </script>
 {% endblock %}

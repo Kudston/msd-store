@@ -3,16 +3,21 @@ import pytz
 from django.shortcuts import render, HttpResponse, reverse, HttpResponseRedirect, redirect
 from django.utils import timezone
 from django.views.generic.list import ListView
+from django.views.generic.edit import UpdateView, DeleteView
 from .models import Products,Sells, Adds
 from django.views import View
 from .forms import ProductCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-
+from django.db.models.functions import Lower
 # Create your views here.
 class ProductsListView(ListView):
     model = Products
-
+    
+    def get_queryset(self, *args, **kwargs):
+        qs = super(ProductsListView, self).get_queryset(*args, **kwargs)
+        qs = qs.order_by(Lower("name"))
+        return qs
     def get_context_data(self, **kwargs):
       context = super().get_context_data(**kwargs)
       context["now"] = timezone.now()
@@ -28,9 +33,15 @@ class ProductCreateView(LoginRequiredMixin,View):
         data = ProductCreationForm(self.request.POST) 
         try:
             if data.is_valid():
+                data_vals = data.cleaned_data
                 data.save()
+                messages.success(self.request,f"Added {data_vals.get('name')} to products.")
                 return   redirect('products-list')
+            else:
+              messages.error(self.request, data.errors)
+              return redirect("products-list")
         except Exception as raised_exception:
+            messages.error(self.request, str(raised_exception))
             return redirect("products-list")
                 
 class ProductEditView(LoginRequiredMixin,View):
@@ -43,7 +54,7 @@ class ProductEditView(LoginRequiredMixin,View):
                 if db_product.quantity>0 and quantity>0:
                     try:
                         if db_product.quantity<quantity:
-                          messages.warning(f'not enough to sell')
+                          messages.warning(self.request,f'not enough to sell')
                           return redirect(reverse('products-list'))
                         try:
                             date_sold = datetime.now(pytz.timezone('Africa/Lagos'))
@@ -98,18 +109,41 @@ class ProductEditView(LoginRequiredMixin,View):
         except Exception as raised_exception:
             return HttpResponse(str(raised_exception))
   
+class ProductUpdateView(LoginRequiredMixin,UpdateView):
+    # specify the model you want to use
+    model = Products
+  
+    # specify the fields
+    fields = [
+        "name",
+        "unit_price"
+    ]
+  
+    success_url = "/"
+
 class SellsTransactionsView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
       data = self.request.GET
-      sells_query_filter = Sells.objects.all()
+      sells_query_filter = Sells.objects
       if data.get('name') is not None:
         sells_query_filter = sells_query_filter.filter(product_name==data.get('name'))
       if data.get('after_date') is not None:
         sells_query_filter = sells_query_filter.filter(date_sold>=data.get('date'))
       if data.get('before_date') is not None:
         sells_query_filter = sells_query_filter.filter(date_sold<=data.get('before_date'))
+      sells_query_filter = sells_query_filter.order_by('-date_sold').values()
       context = {
         'sells':sells_query_filter
       }
       return render(self.request, 'market/sells_transactions.html', context)
-        
+
+class ProductsDeleteView(LoginRequiredMixin,DeleteView):
+    # specify the model you want to use
+    model = Products
+     
+    # can specify success url
+    # url to redirect after successfully
+    # deleting object
+    success_url ="/"
+     
+    template_name = "market/product_delete.html"
