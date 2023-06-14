@@ -3,10 +3,12 @@
 {% block content %}
 <div class="container-fluid">
   <div class="row container-fluid">
-     <input class="col-4 bg-light text-dark" type="text" id="filterInput" placeholder="Type to filter">
+    <div class="form-group col-4 bg-light text-dark">
+      <label class="" for="filterInput">Search input</label>
+      <input class="" type="text" id="filterInput" placeholder="Type to filter">
+    </div>
      <input class="col-4 bg-light text-dark" type="date" id="afterDate" placeholder="dd-mm-yyyy">
      <input class="col-4 bg-light text-dark" type="date" id="beforeDate" placeholder="dd-mm-yyyy">
-     
    </div>
 <table class="table">
   <thead class="thead-light">
@@ -40,9 +42,7 @@
     //date fields
     const beforeDateObject = document.getElementById("beforeDate"); 
     const afterDateObject= document.getElementById("afterDate"); 
-    const beforeDateValue = beforeDateObject.value
-    const afterDateValue = afterDateObject.value
-      
+    
     //add event listener on loading package  
     document.addEventListener('DOMContentLoaded', function() {
       NumberTable();
@@ -71,11 +71,11 @@
                 const date_tag_value = tags[3].textContent;
                 // If the item matches the filter value, display it, otherwise hide it
                 if (text.indexOf(filterValue) > -1 && 
-                  ((afterDateValue==="" || new Date(afterDateValue) < new Date(date_tag_value)) && 
-                  (beforeDateValue==="" || new Date(beforeDateValue) > new Date(date_tag_value)))
+                  ((afterDateObject.value==="" || new Date(afterDateObject.value) < new Date(date_tag_value)) && 
+                  (beforeDateObject.value==="" || new Date(beforeDateObject.value) > new Date(date_tag_value)))
                   ) 
                 {
-                  alert(new Date(afterDateValue));
+                  alert(afterDateObject.value);
                   found = true;
                   break;
                 } 
