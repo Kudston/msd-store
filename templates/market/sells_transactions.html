@@ -3,12 +3,18 @@
 {% block content %}
 <div class="container-fluid">
   <div class="row container-fluid">
-    <div class="form-group col-4 bg-light text-dark">
-      <label class="" for="filterInput">Search input</label>
-      <input class="" type="text" id="filterInput" placeholder="Type to filter">
-    </div>
-     <input class="col-4 bg-light text-dark" type="date" id="afterDate" placeholder="dd-mm-yyyy">
-     <input class="col-4 bg-light text-dark" type="date" id="beforeDate" placeholder="dd-mm-yyyy">
+      <div class="form-group col-4 bg-light">
+        <label class="" for="filterInput">Search input</label>
+        <input class="" type="text" id="filterInput" placeholder="Type to filter">
+      </div>
+      <div class="form-group col-4 bg-light ">
+        <label class="" for="dateinputafter">after date</label>
+        <input class="text-dark" type="date" id="afterDate" placeholder="dd-mm-yyyy">
+      </div>
+      <div class="form-group col-4 bg-light ">
+        <label class="" for="dateinputbefore">before date</label>
+        <input class="text-dark" type="date" id="beforeDate" placeholder="dd-mm-yyyy">
+      </div>
    </div>
 <table class="table">
   <thead class="thead-light">
@@ -75,7 +81,6 @@
                   (beforeDateObject.value==="" || new Date(beforeDateObject.value) > new Date(date_tag_value)))
                   ) 
                 {
-                  alert(afterDateObject.value);
                   found = true;
                   break;
                 } 
@@ -87,7 +92,7 @@
               }
           }
         }
-      
+      NumberTable();
     } 
           
     function NumberTable() {
