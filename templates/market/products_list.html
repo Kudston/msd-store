@@ -1,9 +1,12 @@
-{% extends 'index.html' %} 
+{% extends 'index.html' %}
+{% load static %} 
 {% include 'messages.html' %}
 {% block content %}
  <div class="container-fluid" >
    <div class="row container-fluid">
-     <input class="col-8" type="text" id="filterInput" placeholder="Type to filter">
+     <div class="form-group col-4 bg-light">
+        <input class="col-8" type="text" id="filterInput" placeholder="Type to filter">
+      </div>
    </div>
    <div class="container-fluid">
     <table class="table table-bordered">
@@ -28,11 +31,12 @@
         <td id='product_name'>{{ product.name }}</td>
         <td>{{ product.unit_price }}</td>
         <td>{{ product.quantity }}</td>
-        <td>
-        <form action="{% url 'edit-product' %}" method="post">
-          {% csrf_token %}
-            <input type="hidden" name="id" value={{ product.id }}>
-            <input type="number" name="number" value="0"><input type="submit" name="action" value="sell">
+        <td>          
+          <form action="{% url 'edit-product' %}" method="post">
+            {% csrf_token %}
+              <input type="hidden" name="id" value="{{ product.id }}">
+              <input type="number" name="number" value="0">
+              <button type="button" class="btn row-button">to cart</button>
             {% if user.is_staff %}
               <input type="submit" name="action" value="add">
             {% endif %}
@@ -50,69 +54,20 @@
     {% endfor %}
     </tbody>
   </table>
+  <div id='createOrder'>
+    <a class="btn">New order</a>
+  </div>
+  <table id='OrderDiv' class="table table-bordered">
+
+  </table>
 </div>
 </div>
-
-  <script>
-    // Get the input field and list
-    const filterInput = document.getElementById('filterInput');
-    const list = document.getElementById('list');
-    const items = list.getElementsByTagName('tr');
-
-    document.addEventListener('DOMContentLoaded', function() {
-  // Perform your action here
-      NumberTable();
-    });
-    // Add event listener for input changes
-    filterInput.addEventListener('input', filterList);
-
-    function filterList() {
-      const filterValue = filterInput.value.toLowerCase(); // Convert the input to lowercase for case-insensitive filtering
-       
-      // Loop through all the list items/
-      if(items.length>0)
-        {
-          for (let i = 0; i < items.length; i++) {
-            const item = items[i];
-            const tags = item.getElementsByTagName('td')
-            let found = false;
-            for(let j=0; j<3; j++)
-              {
-                const tag = tags[j];
-                const text = tag.textContent.toLowerCase(); // Get the text content of each item and convert it to lowercase
-                // If the item matches the filter value, display it, otherwise hide it
-                if (text.indexOf(filterValue) > -1) {
-                  item.style.display = '';
-                  found = true;
-                  break;
-                } 
-              }
-            if (found==true) {
-                item.style.display = '';
-              } else {
-                item.style.display = 'none';
-              }
-          }
-        }
-      NumberTable();
-          } 
-          
-  function NumberTable() {
-      // Loop through all the list items/
-      if(items.length>0)
-        {
-          let counts = 0;
-          for (let i = 0; i < items.length; i++) {
-            const item = items[i];
-            const tags = item.getElementsByTagName('th')
-            const tag = tags[0];
-            if(item.style.display=="")
-            { 
-              counts++;
-              tag.textContent = counts;
-            }
-          }
-        }
-      }
-  </script>
+<form id="sellForm" action="{% url 'edit-product' %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="id" value="">
+    <input type="hidden" name="orderId" value="">
+    <input type="hidden" name="number" value="0">
+    <input id="SellOrdersButton" type="submit" class="btn btn-success btn-lg" name="action" value="sell">
+</form>  
+  <script src="{% static '/product_list.js' %}"></script>
 {% endblock %}

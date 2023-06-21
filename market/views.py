@@ -2,16 +2,35 @@ from datetime import datetime
 import pytz
 from django.shortcuts import render, HttpResponse, reverse, HttpResponseRedirect, redirect
 from django.utils import timezone
+from django.http import JsonResponse
 from django.views.generic.list import ListView
 from django.views.generic.edit import UpdateView, DeleteView
+from django.contrib.auth import login
 from django.db.models.functions import Lower
 from django.views import View
-from .forms import ProductCreationForm
+from .forms import ProductCreationForm,NewUserForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 
-from .models import Products,Sells, Adds
+from .models import Products,Sells, Adds, Order
+
+user_registration_token = "admin-4598-users"
 # Create your views here.
+def register_request(request):
+  form = NewUserForm(request.POST)
+  if form.is_valid():
+    registration_token = form.cleaned_data['registration_token']
+    if registration_token!= user_registration_token:
+      messages.error(request, 'Provide the correct registration token.')
+      return redirect('.')
+    user = form.save()
+    login(request, user)
+    messages.success(request, "Registration successful." )
+    return redirect("products-list")
+  messages.error(request, f"Unsuccessful registration. Invalid information.{form.errors.as_json(escape_html=True)}")
+  form = NewUserForm()
+  return render (request=request, template_name="user_register.html", context={"register_form":form})
+	
 class ProductsListView(ListView):
     model = Products
     
@@ -138,13 +157,27 @@ class SellsTransactionsView(LoginRequiredMixin, View):
       }
       return render(self.request, 'market/sells_transactions.html', context)
 
+class AddsTransactionsView(LoginRequiredMixin, View):
+    def get(self, *args, **kwargs):
+      data = self.request.GET
+      sells_query_filter = Adds.objects.all()
+      
+      sells_query_filter = sells_query_filter.order_by('-date_added').values()
+      context = {
+        'adds':sells_query_filter
+      }
+      return render(self.request, 'market/adds_transactions.html', context)
+      
 class ProductsDeleteView(LoginRequiredMixin,DeleteView):
-    # specify the model you want to use
     model = Products
      
-    # can specify success url
-    # url to redirect after successfully
-    # deleting object
     success_url ="/"
      
     template_name = "market/product_delete.html"
+
+
+def OrderCreateView(request):
+  order = Order()
+  order.save()
+  data = {'id':order.id}
+  return JsonResponse(data)
