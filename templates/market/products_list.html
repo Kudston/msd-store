@@ -1,0 +1,66 @@
+{% extends 'index.html' %}
+{% load static %} 
+{% include 'messages.html' %}
+{% block content %}
+ <div class="container-fluid" >
+   <div class="row container-fluid">
+     <div class="form-group col-4 bg-light">
+        <input class="col-8" type="text" id="filterInput" placeholder="Type to filter">
+      </div>
+   </div>
+   <div class="container-fluid">
+    <table class="table table-bordered">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Price</th>
+        <th scope="col">Quantity</th>
+        <th scope="col">Sell</th>
+        {% if user.is_staff %}
+        <th scope="col">
+          Manager Actions
+        </th>
+        {% endif %}
+      </tr>
+    </thead>
+    <tbody id="list">
+    {% for product in object_list %}
+      <tr id="row">
+        <th scope="row">1</th>
+        <td id='product_name'>{{ product.name }}</td>
+        <td>{{ product.unit_price }}</td>
+        <td>{{ product.quantity }}</td>
+        <td>          
+          <form action="{% url 'edit-product' %}" method="post">
+            {% csrf_token %}
+              <input type="hidden" name="id" value="{{ product.id }}">
+              <input type="number" name="number" value="0">
+              <button type="button" class="btn row-button">to cart</button>
+            {% if user.is_staff %}
+              <input type="submit" name="action" value="add">
+            {% endif %}
+          </form>
+        </td>
+        {% if user.is_staff %}
+        <td>
+          <p class="row">
+            <a class="btn btn-success col-6 btn-sm" href="{% url 'product-update' product.id %}">Update</a>
+            <a class="btn btn-danger btn-sm col-6" href="{% url 'product-delete' product.id %}">Delete</a>
+            </a>
+        </td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <div id='createOrder'>
+    <a class="btn btn-primary">Order list</a>
+  </div>
+  <table id='OrderDiv' class="table table-bordered">
+  </table>
+</div>
+  <button id="SellOrdersButton" class="d-none btn btn-success btn-lg">sell</button>
+</div>
+<script src="{% static '/product_list.js' %}"></script>
+{% endblock %}

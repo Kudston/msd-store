@@ -1,0 +1,12 @@
+{% extends "index.html" %}
+{% block content %}
+<div  class="align-middle">
+<form method="post">{% csrf_token %}
+<h2 class="text-warning bg-dark">Are you sure you want to delete "{{ object.name }}"?</h2>
+   <div class="row">
+    <input class="btn btn-danger col-3 btn-lg" type="submit" value="Confirm">
+    <a href="{% url 'products-list' %}" class="btn btn-success col-3 btn-lg">Cancel</a>
+   </div>
+</form>
+</div>
+{% endblock %}
