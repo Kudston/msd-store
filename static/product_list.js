@@ -57,20 +57,18 @@ function NumberTable() {
     }
   }
   
-var id = 0;
+var current_order_id = 0;
 function CreateOrder() {
+    const ordertable = document.getElementById("OrderDiv")
+    const get_orderbook = ordertable.getElementsByTagName("thead")
+    if(get_orderbook.length>0)
+        return;
     fetch('http://localhost:8000/create-order')
     .then((response) => {
         return response.json()})
     .then(data => {
-
         // Process the received data
-        id = data['id']
-        const ordertable = document.getElementById("OrderDiv")
-        const get_orderbook = ordertable.getElementsByTagName("thead")
-        if(get_orderbook.length>0)
-        return;
-
+        current_order_id = data['id']
         var tbody_element = document.createElement("tbody");
         tbody_element.setAttribute("id", "orderList");
         var theader_element = document.createElement("thead")
@@ -222,3 +220,20 @@ order_tableButton.addEventListener('click', function(event) {
     })
 
 const sellButton = document.getElementById("SellOrdersButton")
+
+sellButton.addEventListener('click', function() {
+    const sellForm = document.getElementById("sellForm")
+    var sellform_inputs = sellForm.getElementsByTagName("input")
+    
+    for(let i=0; i<order_storage_list.length; i++){
+        var sell_params = order_storage_list[i];
+        sellform_inputs[1].value = sell_params[2]
+        sellform_inputs[2].value = current_order_id;
+        sellform_inputs[3].value = sell_params[3]
+        
+
+    }
+    
+    order_storage_list = []
+    
+})
