@@ -1,2 +1,2 @@
 # formatio-django-on-ubuntu
-#new
+#just new update
